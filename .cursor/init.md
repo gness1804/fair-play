@@ -25,3 +25,5 @@ cfs bugs create       # Create a bug report
 cfs view              # View incomplete documents (--all for everything)
 cfs gh sync           # Sync with GitHub issues
 ```
+
+For an overview of the project itself, visit proj-init.md.
