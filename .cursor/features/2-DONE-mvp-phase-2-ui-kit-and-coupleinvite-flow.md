@@ -46,3 +46,5 @@ Sonnet code review + Opus security review run. Fixed this phase:
 54 tests: phase machine, invitation logic (all `evaluate` branches + token format), UI components (Button/Badge/Card/Input/Gauge/Modal/Toast), `signIn` email-verification callback.
 
 ## Acceptance criteria
+
+<!-- DONE -->
