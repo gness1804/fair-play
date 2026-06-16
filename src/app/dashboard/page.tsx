@@ -1,61 +1,83 @@
-import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
+import { signOut } from "@/auth";
+import { getCurrentUserWithCouple } from "@/lib/couple";
+import { MAX_COUPLE_MEMBERS } from "@/lib/invitations";
+import { isPhase } from "@/lib/phase";
+import { Badge, Button, Card, CardBody } from "@/components/ui";
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const { user, couple } = await getCurrentUserWithCouple();
+  if (!user) redirect("/");
 
-  if (!session?.user) {
-    redirect("/");
+  // No couple yet, or partner hasn't joined — go run the invite flow.
+  if (!couple || couple.members.length < MAX_COUPLE_MEMBERS) {
+    redirect("/onboarding/invite");
   }
+
+  const partner = couple.members.find((m) => m.id !== user.id);
+  const phaseLabel = isPhase(couple.phase) ? couple.phase : "INVITE";
 
   return (
     <div
       style={{
         maxWidth: "768px",
         margin: "0 auto",
-        padding: "var(--space-8) var(--space-6)",
+        padding: "var(--space-10) var(--space-6)",
       }}
     >
-      <h1
+      <div
         style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--fs-h1)",
-          fontWeight: 700,
-          color: "var(--fg)",
-          margin: "0 0 var(--space-4)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "var(--space-4)",
+          marginBottom: "var(--space-6)",
         }}
       >
-        Dashboard
-      </h1>
-      <p style={{ color: "var(--fg-muted)", marginBottom: "var(--space-6)" }}>
-        Signed in as{" "}
-        <strong style={{ color: "var(--fg)" }}>
-          {session.user.name ?? session.user.email}
-        </strong>{" "}
-        ({session.user.email})
-      </p>
-      <form
-        action={async () => {
-          "use server";
-          await signOut({ redirectTo: "/" });
-        }}
-      >
-        <button
-          type="submit"
+        <h1
           style={{
-            background: "var(--action-primary-bg)",
-            color: "var(--action-primary-fg)",
-            border: "none",
-            borderRadius: "var(--radius-md)",
-            padding: "var(--space-3) var(--space-6)",
-            fontSize: "var(--fs-body)",
-            fontWeight: 500,
-            cursor: "pointer",
+            fontFamily: "var(--font-serif)",
+            fontSize: "var(--fs-h1)",
+            color: "var(--fg)",
+            margin: 0,
           }}
         >
-          Sign out
-        </button>
-      </form>
+          Dashboard
+        </h1>
+        <form
+          action={async () => {
+            "use server";
+            await signOut({ redirectTo: "/" });
+          }}
+        >
+          <Button variant="ghost" size="sm" type="submit">
+            Sign out
+          </Button>
+        </form>
+      </div>
+
+      <Card>
+        <CardBody>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "var(--space-3)",
+              marginBottom: "var(--space-3)",
+            }}
+          >
+            <Badge tone="success">Paired</Badge>
+            <span style={{ color: "var(--fg-muted)", fontSize: "var(--fs-small)" }}>
+              Current step: {phaseLabel}
+            </span>
+          </div>
+          <p style={{ color: "var(--fg)", margin: 0, lineHeight: "var(--lh-body)" }}>
+            You&rsquo;re set up with{" "}
+            <strong>{partner?.name ?? partner?.email ?? "your partner"}</strong>.
+            The next onboarding step will appear here as we build it out.
+          </p>
+        </CardBody>
+      </Card>
     </div>
   );
 }

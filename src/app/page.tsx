@@ -1,12 +1,25 @@
 import { auth, signIn } from "@/auth";
 import { redirect } from "next/navigation";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
   const session = await auth();
 
   if (session?.user) {
     redirect("/dashboard");
   }
+
+  // After Google sign-in, return to the page the visitor was gated from
+  // (e.g. a /join/[token] link). Only allow same-origin relative paths to
+  // avoid an open-redirect; reject protocol-relative ("//host") values.
+  const { callbackUrl } = await searchParams;
+  const redirectTo =
+    callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")
+      ? callbackUrl
+      : "/dashboard";
 
   return (
     <div
@@ -46,7 +59,7 @@ export default async function HomePage() {
       <form
         action={async () => {
           "use server";
-          await signIn("google");
+          await signIn("google", { redirectTo });
         }}
       >
         <button

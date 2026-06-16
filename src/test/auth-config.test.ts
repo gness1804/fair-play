@@ -56,3 +56,32 @@ describe("authConfig", () => {
     expect(result).toBe(true);
   });
 });
+
+describe("authConfig signIn (Google email verification)", () => {
+  const signIn = authConfig.callbacks?.signIn;
+
+  function run(account: unknown, profile: unknown) {
+    if (!signIn) throw new Error("signIn callback missing");
+    return signIn({ account, profile } as unknown as Parameters<typeof signIn>[0]);
+  }
+
+  it("accepts a verified Google email", () => {
+    expect(run({ provider: "google" }, { email_verified: true, email: "a@b.com" })).toBe(true);
+  });
+
+  it("accepts email_verified delivered as the string 'true'", () => {
+    expect(run({ provider: "google" }, { email_verified: "true", email: "a@b.com" })).toBe(true);
+  });
+
+  it("rejects an unverified Google email", () => {
+    expect(run({ provider: "google" }, { email_verified: false, email: "a@b.com" })).toBe(false);
+  });
+
+  it("rejects a Google profile with no email", () => {
+    expect(run({ provider: "google" }, { email_verified: true })).toBe(false);
+  });
+
+  it("allows non-Google providers through", () => {
+    expect(run({ provider: "credentials" }, {})).toBe(true);
+  });
+});

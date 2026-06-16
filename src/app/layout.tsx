@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Lora, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ToastProvider } from "@/components/ui";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -69,7 +70,9 @@ export default function RootLayout({
           </span>
           <ThemeToggle />
         </header>
-        <main>{children}</main>
+        <ToastProvider>
+          <main>{children}</main>
+        </ToastProvider>
       </body>
     </html>
   );

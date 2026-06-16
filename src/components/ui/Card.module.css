@@ -1,0 +1,29 @@
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.elev1 {
+  background: var(--bg-elev-1);
+  box-shadow: var(--shadow-1);
+}
+
+.elev2 {
+  background: var(--bg-elev-2);
+  box-shadow: var(--shadow-2);
+}
+
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--fs-h4);
+  color: var(--fg);
+}
+
+.body {
+  padding: var(--space-5);
+  color: var(--fg);
+}
